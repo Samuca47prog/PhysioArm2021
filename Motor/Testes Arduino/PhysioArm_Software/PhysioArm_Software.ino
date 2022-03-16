@@ -50,6 +50,8 @@
 #define   in3  10     //entrada 3 do ULN2003
 #define   in4  11     //entrada 4 do ULN2003
 
+#define   in5  12     //pino de teste
+
 // Chaves fim de curso
 #define   cfcDireito   5    //entrada 1 do ULN2003
 #define   cfcEsquerdo   6    //entrada 1 do ULN2003
@@ -60,8 +62,10 @@
 
 // -------------------------------------------------------------------- variáveis de controle do motor
 bool    interromperGiro;      // interromper o giro do motor
-bool    disparoGiro;          // disparar o giro do motor
-bool    ReposicionarMotor;    // posicionar o motor em 0º
+bool    disparoGiro;          // disparar o giro do motor 1
+bool    disparoGiroM2;        // disparar o giro do motor 2
+bool    ReposicionarMotor;    // posicionar o motor 1 em 0º
+bool    ReposicionarMotorM2;  // posicionar o motor 2 em 0º
 int     graus = 180;          // quantos graus o motor vai percorrer;
 int     t     = 3;            // velocidade. 2 - rápido -- 10 - lento
 
@@ -104,6 +108,9 @@ void setup()
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
 
+  // pino de teste
+  pinMode(in5, OUTPUT);
+
   // Entradas das chaves fim de curso
   pinMode(cfcDireito, INPUT);
   pinMode(cfcEsquerdo, INPUT);
@@ -124,9 +131,14 @@ void loop(){
         // Lê a serial
         palavra = Serial.readStringUntil('*');
 
-        // ------------------------------------------ comando para disparar o motor
+        // ------------------------------------------ comando para disparar o motor 1
         if (palavra == "DM") {
             disparoGiro = true;
+        }
+        
+        // ------------------------------------------ comando para disparar o motor 2
+        if (palavra == "DM2") {
+            disparoGiroM2 = true;
         }
 
         // ------------------------------------------ comando para executar por tempo de duração
@@ -173,6 +185,11 @@ void loop(){
         if(palavra == "RM"){
             ReposicionarMotor = true;
         }
+
+        // ------------------------------------------ comando para reposicionar o motor
+        if(palavra == "RM2"){
+            ReposicionarMotor = true;
+        }
         
         // ------------------------------------------ Reseta o buffer da serial
         palavra = "";
@@ -193,7 +210,16 @@ void loop(){
         if(not digitalRead(cfcDireito))
           horario(200);     // Gira horário até bater no cfcDireita    
     }
-  
+
+
+    //Rotina para reposicionar o motor
+    if(ReposicionarMotorM2 == true){
+        ReposicionarMotorM2 = false;
+        if(not digitalRead(cfcDireito))
+          horario(200);     // Gira horário até bater no cfcDireita    
+    }
+
+    
     // manda o motor girar
     if (disparoGiro==true) {
         // reseta a variável
