@@ -44,17 +44,21 @@
 // ================================================================================================================================
 // --- Mapeamento de Hardware ---
 
-// pinos do driver ULN2003
+// pinos do motor M1O
 #define   in1   8     //entrada 1 do ULN2003
 #define   in2   9     //entrada 2 do ULN2003
 #define   in3  10     //entrada 3 do ULN2003
 #define   in4  11     //entrada 4 do ULN2003
 
-#define   in5  12     //pino de teste
+// pinos do motor M2C
+#define   inM2C_1   4     //entrada 1 do ULN2003
+#define   inM2C_2   5     //entrada 2 do ULN2003
+#define   inM2C_3   6     //entrada 3 do ULN2003
+#define   inM2C_4   7     //entrada 4 do ULN2003
 
 // Chaves fim de curso
-#define   cfcDireito   5    //entrada 1 do ULN2003
-#define   cfcEsquerdo   6    //entrada 1 do ULN2003
+#define   cfcDireito   2    //entrada 1 do ULN2003
+#define   cfcEsquerdo   3    //entrada 1 do ULN2003
 
 
 // ================================================================================================================================
@@ -63,9 +67,9 @@
 // -------------------------------------------------------------------- variáveis de controle do motor
 bool    interromperGiro;      // interromper o giro do motor
 bool    disparoGiro;          // disparar o giro do motor 1
-bool    disparoGiroM2;        // disparar o giro do motor 2
+bool    disparoGiroM2C;        // disparar o giro do motor 2
 bool    ReposicionarMotor;    // posicionar o motor 1 em 0º
-bool    ReposicionarMotorM2;  // posicionar o motor 2 em 0º
+bool    ReposicionarMotorM2C;  // posicionar o motor 2 em 0º
 int     graus = 180;          // quantos graus o motor vai percorrer;
 int     t     = 3;            // velocidade. 2 - rápido -- 10 - lento
 
@@ -102,14 +106,17 @@ void setup()
   // iniciar a serial
   Serial.begin(9600);
 
-  // pinos do driver
+  // pinos do M1O
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
 
-  // pino de teste
-  pinMode(in5, OUTPUT);
+  // pinos do M2C
+  pinMode(inM2C_1, OUTPUT);
+  pinMode(inM2C_2, OUTPUT);
+  pinMode(inM2C_3, OUTPUT);
+  pinMode(inM2C_4, OUTPUT);
 
   // Entradas das chaves fim de curso
   pinMode(cfcDireito, INPUT);
@@ -137,8 +144,8 @@ void loop(){
         }
         
         // ------------------------------------------ comando para disparar o motor 2
-        if (palavra == "DM2") {
-            disparoGiroM2 = true;
+        if (palavra == "DM2C") {
+            disparoGiroM2C = true;
         }
 
         // ------------------------------------------ comando para executar por tempo de duração
@@ -213,8 +220,8 @@ void loop(){
 
 
     //Rotina para reposicionar o motor
-    if(ReposicionarMotorM2 == true){
-        ReposicionarMotorM2 = false;
+    if(ReposicionarMotorM2C == true){
+        ReposicionarMotorM2C = false;
         if(not digitalRead(cfcDireito))
           horario(200);     // Gira horário até bater no cfcDireita    
     }
@@ -222,8 +229,6 @@ void loop(){
     
     // manda o motor girar
     if (disparoGiro==true) {
-        // reseta a variável
-        disparoGiro = false;
         
         // Responde que o motor foi disparado
         Serial.write("mdi");   
@@ -257,6 +262,12 @@ void loop(){
                 
                 interromperGiro = false;
             }
+
+        // reseta a variável
+        disparoGiro = false;
+
+        // reseta a variável
+        disparoGiroM2C = false;
   
     } //end if(disparoGiro)
     
@@ -339,17 +350,38 @@ void horario(int grau) {
   for (int i = 0; i < grau; i++) {
 
     // ----------------------------------------------------------------- sinais para rotacionar o motor
-    //8 e 9 ligados
-    PORTB = B00001001;    delay(t);
 
-    //9 e 10 ligados
-    PORTB = B00001100;    delay(t);
+    if (disparoGiro == true )
+    {
+        //8 e 9 ligados
+        PORTB = B00001001;    delay(t);
+    
+        //9 e 10 ligados
+        PORTB = B00001100;    delay(t);
+    
+        //10 e 11 ligados
+        PORTB = B00000110;    delay(t);
+    
+        //11 e 8 ligados
+        PORTB = B00000011;    delay(t);
+    }
 
-    //10 e 11 ligados
-    PORTB = B00000110;    delay(t);
+    // ---
 
-    //11 e 8 ligados
-    PORTB = B00000011;    delay(t);
+    if (disparoGiroM2C == true )
+    {
+        //7 e 4 ligados
+        PORTD = B10010000;    delay(t);
+    
+        //6 e 7 ligados
+        PORTD = B11000000;    delay(t);
+    
+        //5 e 6 ligados
+        PORTD = B01100000;    delay(t);
+    
+        //4 e 5 ligados
+        PORTD = B00110000;    delay(t);    
+    }
 
     // ----------------------------------------------------------------- condição de retorno pela serial
     if (Serial.available() > 0) {
@@ -391,17 +423,42 @@ void A_horario(int grau) {
   for (int i = 0; i < grau; i++) {
 
     // ----------------------------------------------------------------- sinais para rotacionar o motor
-    //8 e 9 ligados
-    PORTB = B00000011;    delay(t);
 
-    //9 e 10 ligados
-    PORTB = B00000110;    delay(t);
+    if (disparoGiro == true )
+    {
+        //8 e 9 ligados
+        PORTB = B00000011;    delay(t);
+    
+        //9 e 10 ligados
+        PORTB = B00000110;    delay(t);
+    
+        //10 e 11 ligados
+        PORTB = B00001100;    delay(t);
+    
+        //11 e 8 ligados
+        PORTB = B00001001;    delay(t);
+    }
 
-    //10 e 11 ligados
-    PORTB = B00001100;    delay(t);
+    // ---
 
-    //11 e 8 ligados
-    PORTB = B00001001;    delay(t);
+  //PORTD - B76543210
+
+    //PORTD - B76543210
+    
+    if (disparoGiroM2C == true )
+    {
+        //4 e 5 ligados
+        PORTD = B00110000;    delay(t);
+      
+        //5 e 6 ligados
+        PORTD = B01100000;    delay(t);
+      
+        //6 e 7 ligados
+        PORTD = B11000000;    delay(t);
+      
+        //7 e 4 ligados
+        PORTD = B10010000;    delay(t);
+    }
 
         // ----------------------------------------------------------------- condição de retorno pela serial
     // condição de retorno
