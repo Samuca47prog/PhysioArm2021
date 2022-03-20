@@ -194,8 +194,9 @@ void loop(){
         }
 
         // ------------------------------------------ comando para reposicionar o motor
-        if(palavra == "RM2"){
-            ReposicionarMotor = true;
+        if(palavra == "RM2C"){
+            ReposicionarMotorM2C = true;
+            Serial.print("recebido comando");
         }
         
         // ------------------------------------------ Reseta o buffer da serial
@@ -215,7 +216,9 @@ void loop(){
     if(ReposicionarMotor == true){
         ReposicionarMotor = false;
         if(not digitalRead(cfcDireito))
-          horario(200);     // Gira horário até bater no cfcDireita    
+          disparoGiro = true;
+          horario(200);     // Gira horário até bater no cfcDireita  
+          disparoGiro = false;  
     }
 
 
@@ -223,12 +226,14 @@ void loop(){
     if(ReposicionarMotorM2C == true){
         ReposicionarMotorM2C = false;
         if(not digitalRead(cfcDireito))
+          disparoGiroM2C = true;
           horario(200);     // Gira horário até bater no cfcDireita    
+          disparoGiroM2C = false;
     }
 
     
     // manda o motor girar
-    if (disparoGiro==true) {
+    if (disparoGiro==true or disparoGiroM2C==true) {
         
         // Responde que o motor foi disparado
         Serial.write("mdi");   
@@ -389,6 +394,7 @@ void horario(int grau) {
         //Se foi recebido IM, retorna a função principal
         if (palavra == "IM") {
           disparoGiro = false;
+          disparoGiroM2C = false;
           interromperGiro = true;
           Serial.write("min*");
           return;
@@ -402,6 +408,7 @@ void horario(int grau) {
     //fim de curso direito
     if(cfcDireitoAtual==true and cfcDireitoAntes==false){
         disparoGiro = false;                                                  // ---------+++++++++----------- precisa disso?
+        disparoGiroM2C = false;
         cfcDireitoAntes = true;
         Serial.write("fcd*");
         return;
@@ -467,6 +474,7 @@ void A_horario(int grau) {
       //Se foi recebido IM, retorna a função principal
       if (palavra == "IM") {
         disparoGiro = false;
+        disparoGiroM2C = false;
         interromperGiro = true;
         Serial.write("min*");
         return;
@@ -480,6 +488,7 @@ void A_horario(int grau) {
     //fim de curso direito
     if(cfcEsquerdoAtual==true and cfcEsquerdoAntes==false){
         disparoGiro = false;
+        disparoGiroM2C = false;
         cfcEsquerdoAntes = true;
         Serial.write("fce*");
         return;

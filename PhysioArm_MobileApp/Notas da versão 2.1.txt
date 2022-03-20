@@ -1,0 +1,4 @@
+# V2.1
+
+Versão praticamente traduzida para o inglês
+Aplicativo testado para dois motores. Eles se movimentam individualmente, mas ainda há problema com as chaves fim de curso
