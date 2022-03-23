@@ -1,0 +1,6 @@
+# V2.2
+
+Versão traduzida para o inglês
+Aplicativo controlando dois motores
+
+Controle por tempo não está funcionando

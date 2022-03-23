@@ -70,8 +70,10 @@
 bool    interromperGiro;      // interromper o giro do motor
 bool    disparoGiro;          // disparar o giro do motor 1
 bool    disparoGiroM2C;        // disparar o giro do motor 2
-bool    ReposicionarMotor;    // posicionar o motor 1 em 0º
-bool    ReposicionarMotorM2C;  // posicionar o motor 2 em 0º
+bool    ReposM1Od;    // posicionar o motor 1 em 0º
+bool    ReposM2Cd;  // posicionar o motor 2 em 0º
+bool    ReposM1Oe;    // posicionar o motor 1 em 0º
+bool    ReposM2Ce;  // posicionar o motor 2 em 0º
 int     graus = 180;          // quantos graus o motor vai percorrer;
 int     t     = 3;            // velocidade. 2 - rápido -- 10 - lento
 
@@ -197,14 +199,29 @@ void loop(){
         }
 
         // ------------------------------------------ comando para reposicionar o motor
-        if(palavra == "RM"){
-            ReposicionarMotor = true;
+        if(palavra == "RM1Od"){
+            ReposM1Od = true;
+            Serial.println("M1O na direita");
         }
 
         // ------------------------------------------ comando para reposicionar o motor
-        if(palavra == "RM2C"){
-            ReposicionarMotorM2C = true;
+        if(palavra == "RM2Cd"){
+            ReposM2Cd = true;
+            Serial.println("M2C na direita");
         }
+
+        // ------------------------------------------ comando para reposicionar o motor
+        if(palavra == "RM1Oe"){
+            ReposM1Oe = true;
+            Serial.println("M1O na esquerda");
+        }
+
+        // ------------------------------------------ comando para reposicionar o motor
+        if(palavra == "RM2Ce"){
+            ReposM2Ce = true;
+            Serial.println("M2C na esquerda");
+        }
+        
         
         // ------------------------------------------ Reseta o buffer da serial
         palavra = "";
@@ -220,8 +237,8 @@ void loop(){
      */
 
     //Rotina para reposicionar o motor
-    if(ReposicionarMotor == true){
-        ReposicionarMotor = false;
+    if(ReposM1Od == true){
+        ReposM1Od = false;
         if(not digitalRead(cfcDireito))
           disparoGiro = true;
           horario(200);     // Gira horário até bater no cfcDireita  
@@ -230,11 +247,31 @@ void loop(){
 
 
     //Rotina para reposicionar o motor
-    if(ReposicionarMotorM2C == true){
-        ReposicionarMotorM2C = false;
+    if(ReposM2Cd == true){
+        ReposM2Cd = false;
         if(not digitalRead(cfcM2CDir))
           disparoGiroM2C = true;
           horario(200);     // Gira horário até bater no cfcDireita    
+          disparoGiroM2C = false;
+    }
+
+    
+    //Rotina para reposicionar o motor
+    if(ReposM1Oe == true){
+        ReposM1Oe = false;
+        if(not digitalRead(cfcEsquerdo))
+          disparoGiro = true;
+          A_horario(200);     // Gira horário até bater no cfcDireita  
+          disparoGiro = false;  
+    }
+
+
+    //Rotina para reposicionar o motor
+    if(ReposM2Ce == true){
+        ReposM2Ce = false;
+        if(not digitalRead(cfcM2CEsq))
+          disparoGiroM2C = true;
+          A_horario(200);     // Gira horário até bater no cfcDireita    
           disparoGiroM2C = false;
     }
 
