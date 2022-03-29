@@ -1,4 +1,4 @@
-# V2.4
+# V2.4.1
 
 velocidade setada no thumb sempre será a velocidade do motor
 exercício funcionando por tempo 90% 
@@ -6,3 +6,6 @@ exercício funcionando por tempo 90%
 	se tu poem pra entrar o tempo e dá run, falha!
 Tempo não conta mais apenas na tela de visualização
 a primeira vez que manda por tempo ele faz somente meia repetição
+
+exercício por tempo melhorado, só dá problema quando não é focado a caixa da primeira vez
+velocidade de 1 a 9
