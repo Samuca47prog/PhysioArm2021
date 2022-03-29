@@ -45,8 +45,8 @@
 // --- Mapeamento de Hardware ---
 
 // Chaves fim de curso
-#define   cfcDireito   2    //entrada 1 do ULN2003
-#define   cfcEsquerdo   3    //entrada 1 do ULN2003
+#define   cfcM1ODir   2    //entrada 1 do ULN2003
+#define   cfcM1OEsq   3    //entrada 1 do ULN2003
 
 #define   cfcM2CDir   12    //entrada 1 do ULN2003
 #define   cfcM2CEsq  13    //entrada 1 do ULN2003
@@ -90,6 +90,7 @@ String palavra;               // palavra recebida na serial
 // ---------------------------------------------- Exercícios selecionáveis
 void ex_porRepeticoes(int numRep, int espera, int angulo);
 void ex_porTempo(int numRep, int espera, int angulo);
+bool pedidoInterromperGiro();
 
 // ---------------------------------------------- Executar giros
 void horario(int grau);
@@ -115,8 +116,8 @@ void setup()
   pinMode(7, OUTPUT);
 
   // Entradas das chaves fim de curso
-  pinMode(cfcDireito, INPUT);
-  pinMode(cfcEsquerdo, INPUT);
+  pinMode(cfcM1ODir, INPUT);
+  pinMode(cfcM1OEsq, INPUT);
   pinMode(cfcM2CDir, INPUT);
   pinMode(cfcM2CEsq, INPUT);
 
@@ -227,7 +228,7 @@ void loop(){
     //Rotina para reposicionar o motor
     if(ReposM1Od == true){
         ReposM1Od = false;
-        if(not digitalRead(cfcDireito))
+        if(not digitalRead(cfcM1ODir))
           disparoGiroM1O = true;
           horario(200);     // Gira horário até bater no cfcDireita  
           disparoGiroM1O = false;  
@@ -247,7 +248,7 @@ void loop(){
     //Rotina para reposicionar o motor
     if(ReposM1Oe == true){
         ReposM1Oe = false;
-        if(not digitalRead(cfcEsquerdo))
+        if(not digitalRead(cfcM1OEsq))
           disparoGiroM1O = true;
           A_horario(200);     // Gira horário até bater no cfcDireita  
           disparoGiroM1O = false;  
@@ -385,12 +386,10 @@ void horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM1ODirAnt = cfcM1ODirAtu;
-          cfcM1ODirAtu = digitalRead(cfcDireito);
+          cfcM1ODirAtu = digitalRead(cfcM1ODir);
       
           //fim de curso direito
-          if(cfcM1ODirAtu==true and cfcM1ODirAnt==false){
-              disparoGiroM1O = false;
+          if(cfcM1ODirAtu==true){
               Serial.write("fcd*");
               return;
           } 
@@ -410,16 +409,8 @@ void horario(int grau) {
               }
   
           // ----------------------------------------------------------------- condição de retorno pela serial
-          if (Serial.available() > 0) {
-              palavra = Serial.readStringUntil('*');
-              //Se foi recebido IM, retorna a função principal
-              if (palavra == "IM") {
-                disparoGiroM1O = false;
-                interromperGiro = true;
-                Serial.write("min*");
-                return;
-              }
-          }
+          if(pedidoInterromperGiro())
+              return;
       
       }
 
@@ -432,12 +423,10 @@ void horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM2CDirAnt = cfcM2CDirAtu;
           cfcM2CDirAtu = digitalRead(cfcM2CDir);
       
           //fim de curso direito
-          if(cfcM2CDirAtu==true and cfcM2CDirAnt==false){
-              disparoGiroM2C = false;
+          if(cfcM2CDirAtu==true){
               Serial.write("fcd*");
               return;
           } 
@@ -457,25 +446,13 @@ void horario(int grau) {
           }
   
           // ----------------------------------------------------------------- condição de retorno pela serial
-          if (Serial.available() > 0) {
-              palavra = Serial.readStringUntil('*');
-              //Se foi recebido IM, retorna a função principal
-              if (palavra == "IM") {
-                disparoGiroM2C = false;
-                interromperGiro = true;
-                Serial.write("min*");
-                return;
-              }
-          }
+          if(pedidoInterromperGiro())
+              return;
     
       }
 
       Serial.write("mch*");           // responde que chegou no destino
   }
-
-
-  
-
 }//end horario()
 
 // --------------------------------------------------------------------------------------------------- Sentido de giro anti-horário
@@ -488,15 +465,11 @@ void A_horario(int grau) {
   if (disparoGiroM1O == true )
   {
        for (int i = 0; i < grau; i++) {
-
-
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM1OEsqAnt = cfcM1OEsqAtu;
-          cfcM1OEsqAtu = digitalRead(cfcEsquerdo);
+          cfcM1OEsqAtu = digitalRead(cfcM1OEsq);
       
           //fim de curso direito
-          if(cfcM1OEsqAtu==true and cfcM1OEsqAnt==false){
-              disparoGiroM1O = false;                                   
+          if(cfcM1OEsqAtu==true){                                  
               Serial.write("fcd*");
               return;
           }  
@@ -514,23 +487,12 @@ void A_horario(int grau) {
               //11 e 8 ligados
               PORTB = B00001001;    delay(t);
           }
-
           // ----------------------------------------------------------------- condição de retorno pela serial
-          if (Serial.available() > 0) {
-              palavra = Serial.readStringUntil('*');
-              //Se foi recebido IM, retorna a função principal
-              if (palavra == "IM") {
-                disparoGiroM1O = false;
-                interromperGiro = true;
-                Serial.write("min*");
-                return;
-              }
-          }
-      
-      }
-
-      Serial.write("mch*");           // responde que chegou no destino
-  }
+          if(pedidoInterromperGiro())
+              return;
+              
+      }//end for graus
+  }//end if motor M1O
 
 
   if (disparoGiroM2C == true )
@@ -538,12 +500,10 @@ void A_horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM2CEsqAnt = cfcM2CEsqAtu;
           cfcM2CEsqAtu = digitalRead(cfcM2CEsq);
       
           //fim de curso direito
-          if(cfcM2CEsqAtu==true and cfcM2CEsqAnt==false){
-              disparoGiroM2C = false;
+          if(cfcM2CEsqAtu==true){
               Serial.write("fcd*");
               return;
           } 
@@ -563,22 +523,25 @@ void A_horario(int grau) {
           }
   
           // ----------------------------------------------------------------- condição de retorno pela serial
-          if (Serial.available() > 0) {
-              palavra = Serial.readStringUntil('*');
-              //Se foi recebido IM, retorna a função principal
-              if (palavra == "IM") {
-                disparoGiroM2C = false;
-                interromperGiro = true;
-                Serial.write("min*");
-                return;
-              }
-          }
-      
-      }
-
-      Serial.write("mch*");           // responde que chegou no destino
-  }
-
-
-
+          if(pedidoInterromperGiro())
+              return;
+              
+      }//end for graus
+  }//end if motor M2C
+  
+  Serial.write("mch*");   // responde que chegou no destino
+  
 }//end A_horario()
+
+// --------------------------------------------------------------------------------------------------- Confere se foi pedido para parar o motor
+bool pedidoInterromperGiro() {
+  if (Serial.available() > 0) {
+    palavra = Serial.readStringUntil('*');
+    //Se foi recebido IM, retorna a função principal
+    if (palavra == "IM") {
+      interromperGiro = true;
+      Serial.write("min*");
+      return true;
+    }
+  }
+}//end pedidoInterrompido()

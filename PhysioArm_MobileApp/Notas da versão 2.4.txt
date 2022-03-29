@@ -1,0 +1,8 @@
+# V2.4
+
+velocidade setada no thumb sempre será a velocidade do motor
+exercício funcionando por tempo 90% 
+	para no tempo certo, porém conta 1 segundo a mais no front
+	se tu poem pra entrar o tempo e dá run, falha!
+Tempo não conta mais apenas na tela de visualização
+a primeira vez que manda por tempo ele faz somente meia repetição
