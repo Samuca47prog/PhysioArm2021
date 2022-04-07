@@ -47,7 +47,6 @@
 // Chaves fim de curso
 #define   cfcM1ODir   2    //entrada 1 do ULN2003
 #define   cfcM1OEsq   3    //entrada 1 do ULN2003
-
 #define   cfcM2CDir   12    //entrada 1 do ULN2003
 #define   cfcM2CEsq  13    //entrada 1 do ULN2003
 
@@ -72,14 +71,10 @@ int    numRepeticoes;         // guarda o número de repetições setado
 int    numTempo;              // guarda a quantidade de tempo selecionada
 
 // -------------------------------------------------------------------- retornos das chaves fim de curso
-bool   cfcM1ODirAnt;       // chave fim de curso Direita antes
-bool   cfcM1OEsqAnt;      // chave fim de curso Esquerda antes
-bool   cfcM1ODirAtu;       // chave fim de curso Direita No momento
-bool   cfcM1OEsqAtu;      // chave fim de curso Esquerda No momento
-bool   cfcM2CDirAnt;          // chave fim de curso M2C Direita antes
-bool   cfcM2CEsqAnt;          // chave fim de curso M2C Esquerda antes
-bool   cfcM2CDirAtu;          // chave fim de curso M2C Direita No momento
-bool   cfcM2CEsqAtu;          // chave fim de curso M2C Esquerda No momento
+bool   isCfcM1ODir;       // chave fim de curso Direita No momento
+bool   isCfcM1OEsq;      // chave fim de curso Esquerda No momento
+bool   isCfcM2CDir;          // chave fim de curso M2C Direita No momento
+bool   isCfcM2CEsq;          // chave fim de curso M2C Esquerda No momento
 
 // -------------------------------------------------------------------- Serial
 String palavra;               // palavra recebida na serial
@@ -324,7 +319,6 @@ void ex_porRepeticoes(int numRep, int espera, int angulo){
       A_horario(angulo); 
       
       if (interromperGiro){             // quebra o laço caso tenha sido pedido
-          //interromperGiro = false;
           break;
       }
       
@@ -334,7 +328,6 @@ void ex_porRepeticoes(int numRep, int espera, int angulo){
       horario(angulo); 
           
       if (interromperGiro){             // quebra o laço caso tenha sido pedido durante a função de giro
-          //interromperGiro = false;
           break;
       }
       
@@ -352,7 +345,6 @@ void ex_porTempo(int numRep, int espera, int angulo){
         A_horario(angulo); 
         
         if (interromperGiro){             // quebra o laço caso tenha sido pedido
-            //interromperGiro = false;
             break;
         }
         
@@ -362,7 +354,6 @@ void ex_porTempo(int numRep, int espera, int angulo){
         horario(angulo); 
             
         if (interromperGiro){             // quebra o laço caso tenha sido pedido durante a função de giro
-            //interromperGiro = false;
             break;
         }
         
@@ -386,10 +377,10 @@ void horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM1ODirAtu = digitalRead(cfcM1ODir);
+          isCfcM1ODir = digitalRead(cfcM1ODir);
       
           //fim de curso direito
-          if(cfcM1ODirAtu==true){
+          if(isCfcM1ODir==true){
               Serial.write("fcd*");
               return;
           } 
@@ -423,10 +414,10 @@ void horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM2CDirAtu = digitalRead(cfcM2CDir);
+          isCfcM2CDir = digitalRead(cfcM2CDir);
       
           //fim de curso direito
-          if(cfcM2CDirAtu==true){
+          if(isCfcM2CDir==true){
               Serial.write("fcd*");
               return;
           } 
@@ -466,10 +457,10 @@ void A_horario(int grau) {
   {
        for (int i = 0; i < grau; i++) {
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM1OEsqAtu = digitalRead(cfcM1OEsq);
+          isCfcM1OEsq = digitalRead(cfcM1OEsq);
       
           //fim de curso direito
-          if(cfcM1OEsqAtu==true){                                  
+          if(isCfcM1OEsq==true){                                  
               Serial.write("fcd*");
               return;
           }  
@@ -500,10 +491,10 @@ void A_horario(int grau) {
        for (int i = 0; i < grau; i++) {
 
           // ----------------------------------------------------------------- lógica das chaves fim de curso
-          cfcM2CEsqAtu = digitalRead(cfcM2CEsq);
+          isCfcM2CEsq = digitalRead(cfcM2CEsq);
       
           //fim de curso direito
-          if(cfcM2CEsqAtu==true){
+          if(isCfcM2CEsq==true){
               Serial.write("fcd*");
               return;
           } 
